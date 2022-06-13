@@ -1,0 +1,67 @@
+=head1 NAME
+
+fabsys_server - Run the FABS server
+
+=head1 SYNOPSIS
+
+B<fabsys server> [B<--once>]
+
+=head1 DESCRIPTION
+
+The B<fabsys server> command runs the FABS server process. This server process
+monitors the database for newly-scheduled backup runs, and drives the backup
+process forwards. It also monitors for and retries failures during the backup
+process, and sends out reports for finished backup runs, as well as any other
+continuous activities that are necessary for FABS operation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--once>
+
+By default, B<fabsys server> runs continuously, monitoring the database for work
+to do. With the B<--once> flag, it will instead just look in the database once,
+process any work it finds, and then exit. This is primarily intended as a
+debugging tool, but it could potentially be used to force work to be done
+immediately.
+
+=back
+
+=head1 CONFIGURATION
+
+Without B<--once>, the B<fabsys server> process is a long-running process, but
+only reads in config data from disk once during startup. If you make any
+changes to the yaml FABS config files, you need to restart the B<fabsys server>
+process for it to notice those changes. There is currently no way for
+B<fabsys server> to re-read the on-disk config files while it is running.
+
+For information on the config files and various config directives, see
+C<fabsys_config(1)>.
+
+=head1 SIGNALS
+
+B<fabsys server> will exit gracefully on receiving the SIGINT or SIGTERM
+signals. This will not cause any spawned jobs to quit; those will continue
+processing the relevant work until they are finished, and then they will quit
+on their own.
+
+For example, when performing backup dumps, B<fabsys server> spawns a process to
+handle each dump. Killing the B<fabsys server> process will not stop these dumps
+after they have been started (and B<fabsys server> will not wait for them to
+complete). Instead, B<fabsys server> will quit, and the dumps will continue to
+be processed until they are finished, and then they will quit gracefully.
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>. The issuer must also be able write to the
+configured volume blob storage directory, typically
+B</var/lib/fabs/fabs-dumps/> by default.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

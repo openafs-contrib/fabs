@@ -1,0 +1,32 @@
+=head1 NAME
+
+fabsys_backup-needed - Query FABS if a volume needs to be backed up
+
+=head1 SYNOPSIS
+
+B<fabsys backup-needed> <I<volume>>
+
+=head1 DESCRIPTION
+
+The B<fabsys backup-needed> command can be used to see if FABS will backup the
+volume <I<volume>> on its next backup run. The result of this command will tell
+the caller whether or not a volume will be skipped on the next volume run, or
+if a new dump of the volume will be done. If the volume will be skipped,
+B<fabsys backup-needed> will also say why.
+
+A volume may be skipped because it has not changed since its last backup, or
+because the volume is offline (see config option C<dump/if_offline> in
+C<fabsys_config(1)>). In the future, volumes may be skipped for other reasons
+as well, according to your FABS configuration.
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

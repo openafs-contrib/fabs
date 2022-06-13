@@ -1,0 +1,48 @@
+=head1 NAME
+
+fabsys_backup-retry - Resume a failed backup run
+
+=head1 SYNOPSIS
+
+B<fabsys backup-retry> <I<brun_id>>
+
+=head1 DESCRIPTION
+
+The B<fabsys backup-retry> command causes a backup run that was previously
+marked as failed to resume. The backup run is retried from the last successful
+stage of the backup, and proceeds as normal.
+
+A backup run can be marked as "failed" either due to errors, or because someone
+killed the backup run with C<fabsys_backup-kill(1)>. A single error normally
+does not cause a backup run to be marked as "failed".
+
+The failure to backup a single volume does not cause the entire backup run to
+fail, so any such error must prevent the entire backup from proceeding (e.g.,
+if we cannot examine the vldb for volumes to backup). Operations are also
+retried when an error occurs, so a backup run that is marked as "failed" must
+have encountered an error multiple times. It is recommended that an
+administrator first determine why a backup run failed, and fix it, before
+running B<fabsys backup-retry> on that backup run.
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<brun_id>>
+
+The backup run id to resume. Backup run ids can be shown with the
+C<fabsys_backup-status(1)> command.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

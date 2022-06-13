@@ -1,0 +1,47 @@
+=head1 NAME
+
+fabsys_restore-kill - Forcibly kill a running restore request
+
+=head1 SYNOPSIS
+
+B<fabsys restore-kill> <I<req_id>> [B<--note> <I<note>>]
+
+=head1 DESCRIPTION
+
+The B<fabsys restore-kill> command causes a running restore request run to
+abort, and immediately be considered "failed". This can be useful if a backup
+run was accidentally started, or if a run is malfunctioning or hanging for some
+reason.
+
+Note that killing a backup run does not immediately kill in-progress volume
+restore processes, or aspects of a restore request. However, all aspects of the
+request should notice fairly quickly that the request run has failed (after a
+few minutes at most), and will abort themselves.
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<req_id>>
+
+The restore request id to kill. Restore request ids can be shown with the
+C<fabsys_restore-status(1)> command.
+
+=item B<--note> <I<note>>
+
+This flag specifies a free-form note to indicate why the restore request is
+being killed.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

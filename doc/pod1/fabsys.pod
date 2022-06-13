@@ -1,0 +1,158 @@
+=head1 NAME
+
+fabsys - Command suite for the FABS backup system
+
+=head1 SYNOPSIS
+
+B<fabsys> [B<--config=>I<file>] [B<-x> I<key>=I<val>] [B<--format> I<format>]
+    <I<command>> <I<arguments>>
+
+=head1 DESCRIPTION
+
+B<fabsys> is the frontend command suite for the Flexible AFS Backup System
+(FABS), used for backing up AFS data via volume blobs to disk. This page just
+provides general documentation common to all B<fabsys> commands. For
+documentation on individual command, see L<COMMANDS> below.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config=>I<config_file>
+
+Specify an alternate configuration file to use. The default behavior is to read
+all configuration files in B</etc/fabs/fabs.yaml.d/>.
+
+=item B<-x> I<key>=I<value>
+
+Specify an extra configuration option to use during execution of the given
+command. This will override the configuration in any configuration files. See
+C<fabsys_config(1)> for more information about available configuration
+directives.
+
+=item B<--format> I<format>
+
+Specify what format to use to output information for the given command.
+Available formats are:
+
+=over 4
+
+=item B<txt>
+
+Output information in human-readable text. The formatting and wording of output
+in this format may change over time, and should not be relied upon for scripts.
+This is the default option.
+
+=item B<json>
+
+Output information in a JSON-formatted object.
+
+=back
+
+=item B<--version>
+
+Causes B<fabsys> to print its version to stdout and then exit.
+
+=item B<--help>
+
+Prints a usage message for the specified subcommand, or a general usage message
+if no subcommand is given.
+
+=back
+
+=head1 ENVIRONMENT
+
+If the C<FABS_DEBUG> environment variable is set to 1, it is roughly
+equivalent to passing the command line options "-x log/level=debug". However,
+as opposed to setting this option on the command line or in the config file,
+using this environment variable turns on debugging very early, before any
+config files are loaded or command-line arguments are parsed. This can be
+useful in debugging configuration loading or command-line argument parsing.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<fabsys_backup-inject(1)>
+
+Inject a volume dump blob into FABS.
+
+=item C<fabsys_backup-kill(1)>
+
+Forcibly kill a running backup run.
+
+=item C<fabsys_backup-needed(1)>
+
+Query FABS if a volume needs to be backed up.
+
+=item C<fabsys_backup-retry(1)>
+
+Resume a failed backup run.
+
+=item C<fabsys_backup-start(1)>
+
+Start a backup run.
+
+=item C<fabsys_backup-status(1)>
+
+View the status of backup runs that are actively running or have failed due to
+errors.
+
+=item C<fabsys_config(1)>
+
+Query information about the local configuration. The referenced manpage also
+documents all known configuration directives.
+
+=item C<fabsys_db-init(1)>
+
+Initialize the SQL database for fabs.
+
+=item C<fabsys_dump-find(1)>
+
+Find dumps in the FABS backup database.
+
+=item C<fabsys_dump-list(1)>
+
+List dumps in the FABS backup database.
+
+=item C<fabsys_restore-kill(1)>
+
+Forcibly kill a running restore request.
+
+=item C<fabsys_restore-retry(1)>
+
+Resume a failed restore request.
+
+=item C<fabsys_restore-start(1)>
+
+Create a new restore request.
+
+=item C<fabsys_restore-status(1)>
+
+View status of FABS restore requests.
+
+=item C<fabsys_server(1)>
+
+Run the fabs server, a server process for monitoring and driving forwards the
+backup process.
+
+=item C<fabsys_storage-init(1)>
+
+Initialize the local disk storage used for storing volume blobs on disk.
+
+=item C<fabsys_storage-trim(1)>
+
+Find trimmable dumps in FABS storage.
+
+=item fabsys_vars
+
+This command prints various "compile-time" constants built in to the fabs
+code.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "{}"
+exit 0
+
+# #!/usr/bin/perl
+#
+# use strict;
+# use warnings;
+#
+# use JSON::PP;
+#
+# my $data = {
+#     include => {
+#         volumes => ["bkup.*"],
+#         fileservers => ["fs1.example.com", "fs3.example.com"],
+#     },
+#     exclude => {
+#         volumes => ["nobkup.*"],
+#         fileservers => ["fs2.example.com", "fs6.example.com"],
+#     },
+# };
+#
+# print JSON::PP->new->encode($data);

@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+export PYBUILD_NAME=fabs
+#export PYBUILD_DISABLE=test
+
+export PREFIX=/usr
+export LOCALSTATEDIR=/var
+export SYSCONFDIR=/etc
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_build:
+	dh_auto_build
+	./doc/generate-man doc
+
+override_dh_python3:
+	dh_python3 --recommends-section=Alembic

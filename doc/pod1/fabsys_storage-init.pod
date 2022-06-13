@@ -1,0 +1,49 @@
+=head1 NAME
+
+fabsys_storage-init - Initialize volume blob storage dirs for FABS
+
+=head1 SYNOPSIS
+
+B<fabsys storage-init> (B<--all> | B<--dir> <I<dir>>)
+
+=head1 DESCRIPTION
+
+The B<fabsys storage-init> command initializes one or more directories as FABS
+storage dirs, making them usable for FABS backup runs.
+
+Before a storage dir can be used, it must be initialized by this command. This
+is to ensure that FABS does not mistakenly use the wrong directory (for
+example, if a mount fails), and that the blob storage format has not changed
+(for example, by a future version of FABS).
+
+If B<fabsys storage-init> encounters a directory that has already been
+initialized, that directory will just be skipped. This is not considered an
+error.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--all>
+
+Initialize all storage dirs configured in the C<dump/storage_dirs>
+configuration directive. See C<fabsys_config(1)> for more information.
+
+=item B<--dir> <I<dir>>
+
+Initialize the specified directory. This can be useful to prepare a directory
+for use by FABS before adding it to the configuration.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration,
+typically in B</etc/fabs/fabs.yaml.d/>, as well as be able to write to the
+configured volume blob storage directory.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

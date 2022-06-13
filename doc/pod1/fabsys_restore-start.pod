@@ -1,0 +1,60 @@
+=head1 NAME
+
+fabsys_restore-start - Create a new restore request
+
+=head1 SYNOPSIS
+
+B<fabsys restore-start> B<--dump-id> <I<dump_id>> [B<--path> <I<path>>]
+                 [B<--note> <I<note>>] [B<--admin>] [B<--user> <I<user>>]
+
+=head1 DESCRIPTION
+
+The B<fabsys restore-start> command creates a new request to restore a volume from
+backup.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--dump-id> <I<dump_id>>
+
+The dump id to restore. Dump ids can be found by using the C<fabsys_dump-find(1)>
+command.
+
+=item B<--path> <I<path>>
+
+This specifies the path that a user requested to restore, if this request is
+for an end-user that was requested via a path. This is used just for
+informational purposes for informing users of what data they were trying to
+restore.
+
+=item B<--note> <I<note>>
+
+This adds a free-form note to be associated with this restore request. If none
+is provided, the default note just indicates the restore request was initiated
+manually from the command line.
+
+=item B<--admin>
+
+This flag indicates that the request is being performed by an administrator,
+and so authorization checks are bypassed.
+
+=item B<--user> I<user>
+
+This flag indicates the restore request is being done for a user. Authorization
+checks are performed to ensure that the user is permitted to restore the
+requested volume.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

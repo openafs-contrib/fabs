@@ -1,0 +1,24 @@
+=head1 NAME
+
+sbaf - Internal commands for the FABS backup system
+
+=head1 SYNOPSIS
+
+B<sbaf> [B<--config=>I<file>] [B<-x> I<key>=I<val>]
+    <I<command>> <I<arguments>>
+
+=head1 DESCRIPTION
+
+B<sbaf> is the internal/developer command suite for the Flexible AFS Backup
+System (FABS). Specific sub-commands for B<sbaf> are intentionally not
+documented and may change at any time; only use these commands for development
+purposes or in very special situations. To see what commands are available, run
+B<sbaf> B<--help>.
+
+For the frontend command suite for FABS, see B<fabsys>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

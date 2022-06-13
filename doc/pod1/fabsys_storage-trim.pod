@@ -1,0 +1,126 @@
+=head1 NAME
+
+fabsys_storage-trim - Find trimmable dumps in FABS storage
+
+=head1 SYNOPSIS
+
+B<fabsys storage-trim> [B<-0>]
+
+=head1 DESCRIPTION
+
+The B<fabsys storage-trim> command is used to list volume dump blobs in the
+fabs storage backend that are eligible for trimming. A blob is considered
+eligible for trimming if there are other, newer, volume dump blobs for the
+same volume. That is, this command lists redundant volume dump blobs that are
+not needed to restore the most recent copy of data for a volume.
+
+The general idea is that you run this command periodically to reduce the amount
+of disk space that the fabs backend disk storage uses. You can run this
+command to get a list of trimmable file names, and for each file name, you can
+check if that file has been backed up to tape or some other long term storage.
+If it has, you can safely delete the file, and fabs will later request that
+the file be restored from tape (via the B<backend/request_cmd> config
+directive) if it is required to fulfill a restore request.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-0>
+
+By default, B<fabsys storage-trim> prints out trimmable filenames separated by
+newlines. By giving the B<-0> option, filenames are separated by a NUL
+character, instead.
+
+This option is only used for B<--format txt>. For B<--format json>, each
+trimmable dump results in an object with information about that dump.
+
+=back
+
+=head1 EXAMPLES
+
+    $ fabsys storage-trim
+    /var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.2001.dump
+    /var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.8001.dump
+
+    $ fabsys storage-trim --format json
+    {
+      "fabs_storage_trim": [
+        {
+          "path": "/var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.1.dump",
+          "dump": {
+            "id": 2001,
+            "vl_id": 2001,
+            "hdr_size": 31,
+            "hdr_creation": 1643664307,
+            "hdr_copy": 1630435695,
+            "hdr_backup": 1643664307,
+            "hdr_update": 1643664276,
+            "incr_timestamp": 0,
+            "dump_size": 32586,
+            "dump_storid": 1,
+            "dump_spath": "cell-example.com/20/00/00/536871063/536871063.2001.dump",
+            "dump_checksum": "md5:e6bfbf431cc3d243d6b80d4454aba454",
+            "name": "vol.1",
+            "rwid": 536871063,
+            "roid": None,
+            "bkid": 536871065,
+            "cell": "example.com",
+            "br_id": 2,
+            "dump_blob": {
+              "bstore": {
+                "uuid": "a6888379-dfe9-4b72-a95a-eb13bb6b7c18",
+                "storid": 1,
+                "prefix": "/var/lib/fabs/fabs-dumps"
+              },
+              "rel_path": "cell-example.com/20/00/00/536871063/536871063.2001.dump",
+              "abs_path": "/var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.2001.dump"
+            }
+          }
+        },
+        {
+          "path": "/var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.1.dump",
+          "dump": {
+            "id": 2003,
+            "vl_id": 8001,
+            "hdr_size": 31,
+            "hdr_creation": 1644882450,
+            "hdr_copy": 1630435695,
+            "hdr_backup": 1644882450,
+            "hdr_update": 1644882417,
+            "incr_timestamp": 0,
+            "dump_size": 32586,
+            "dump_storid": 1,
+            "dump_spath": "cell-example.com/20/00/00/536871063/536871063.8001.dump",
+            "dump_checksum": "md5:ebb0dfbd0badc6721a7f1c8b557fc06c",
+            "name": "vol.1",
+            "rwid": 536871063,
+            "roid": None,
+            "bkid": 536871065,
+            "cell": "example.com",
+            "br_id": 5,
+            "dump_blob": {
+              "bstore": {
+                "uuid": "a6888379-dfe9-4b72-a95a-eb13bb6b7c18",
+                "storid": 1,
+                "prefix": "/var/lib/fabs/fabs-dumps"
+              },
+              "rel_path": "cell-example.com/20/00/00/536871063/536871063.8001.dump",
+              "abs_path": "/var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.8001.dump"
+            }
+          },
+        }
+      ]
+    }
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

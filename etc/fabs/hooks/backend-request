@@ -1,0 +1,17 @@
+#!/bin/sh
+
+path="$FABS_BACKEND_DUMP_PATH"
+if [ x"$path" = x ] ; then
+    echo "Missing fabs backend dump path" >&2
+    exit 1
+fi
+
+# Normally we would just print out some simple identifier for some "restore
+# request" for the volume dump blob being restored by some other system. But in
+# lieu of such a system, we just tell the user to ask the administrator to do
+# the restore.
+echo "The dump file for your requested volume is missing, and an automated"
+echo "recovery system has not been configured. Please ask your backup"
+echo "administrator to restore file: $FABS_BACKEND_DUMP_PATH"
+echo
+echo "This restore request cannot proceed until that file has been restored."

@@ -1,0 +1,90 @@
+=head1 NAME
+
+fabsys_dump-find - Find dumps in the FABS backup database
+
+=head1 SYNOPSIS
+
+B<fabsys dump-find> [B<--path> <I<path>>] [B<--volume> <I<volume>>]
+    [B<--near> <I<timestamp>>] [B<-n> <I<n_dumps>>] [B<--admin>]
+    [B<--user> <I<user>>]
+
+=head1 DESCRIPTION
+
+The B<fabsys dump-find> command searches for dumps of volumes that have been
+backed up by FABS.
+
+This command is intended to be used to find dumps to restore from. See
+C<fabsys dump-list> for a similar command to examine volume dumps for
+maintenance purposes.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--path> <I<path>>
+
+Find dumps that are associated with data in the specified path name. The path
+refers to a path in /afs, for example: /afs/cell/foo/bar/baz. FABS will use
+data in its backup database to translate the path to a volume, and find volume
+dumps for that volume.
+
+Note that all of the path components must be backed up in FABS in order for
+this to work properly. For example, say you have a volume "app.foo" mounted at
+/afs/cell/app/foo, and a volume "app.root" mounted at /afs/cell/app. If
+"app.foo" is backed up, but "app.root" is B<not>, then specifying
+B<--path /afs/cell/app/foo> will not be able to find the "app.foo" volume,
+since FABS doesn't have the mountpoint data inside /afs/cell/app.
+
+In other words, if a volume is backed up, the "parent" volumes for that volume
+should also be backed up. Otherwise, such volumes will not be findable via
+B<--path> (but can still be found via other means, such as B<--volume>).
+
+=item B<--volume> <I<volume>>
+
+Find dumps for data in the specified volume. Instead of finding data by path,
+this instead just searches for data for the specific volume, and prints the
+associated dumps.
+
+=item B<--near> <I<timestamp>>
+
+If this flag is passed, this command will try to find backups from around the
+time of the given timestamp. By default without this flag, this command will
+just find the most recent dumps instead.
+
+The given time can be given as a unix timestamp with a leading "@" (e.g.
+"--near @1644102842"), or as an ISO-8601 string, or any format understood by
+the Python module dateutil.parser (e.g. "2022-02-05 23:14:02 UTC").
+
+For backwards compatibility, the timestamp can also be given as a raw unix
+timestamp (e.g. "--near 1644102842"). However, this can be ambiguous with other
+time specifications, so it is recommended to use the "@" form.
+
+=item B<-n> <I<n_dumps>>
+
+This changes the number of dumps that this command will print out. By default,
+it prints information about a maximum of 3 dumps.
+
+=item B<--admin>
+
+This flag indicates that the request is being performed by an administrator,
+and so authorization checks are bypassed.
+
+=item B<--user> I<user>
+
+This flag indicates the restore request is being done for a user. Authorization
+checks are performed to ensure that the user is permitted to restore the
+requested volume.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

@@ -1,0 +1,21 @@
+[TYPECHECK]
+# List of classes names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set).
+ignored-classes=RestoreRequest,DumpJob,BackupRun,VolDump,SubCommand
+ignored-modules=fabs.const
+
+[MESSAGES CONTROL]
+enable=useless-suppression
+# Disable 'C'onvention and 'R'efactor messages, and some other specific
+# messages
+disable=C,R,global-statement,unused-argument,locally-disabled
+
+[EXCEPTIONS]
+# 'except Exception:' is okay, 'except BaseException:' is not
+overgeneral-exceptions=BaseException
+
+[REPORTS]
+reports=no
+
+[MASTER]
+persistent=no

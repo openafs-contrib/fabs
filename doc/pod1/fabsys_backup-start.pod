@@ -1,0 +1,63 @@
+=head1 NAME
+
+fabsys_backup-start - Start a new FABS backup run
+
+=head1 SYNOPSIS
+
+B<fabsys backup-start> [B<--note> <I<note>>] (B<--all> | B<--volume> <I<pattern>>)
+
+=head1 DESCRIPTION
+
+The B<fabsys backup-start> command creates and starts a new FABS backup run. This
+command does not wait for the backup run to finish; it just schedules the
+backup run and lets B<fabsys server> actually process it.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--all>
+
+Backup all configured volumes. With this option specified, FABS will backup
+volumes according to C<dump/include/*>, C<dump/exclude/*>, and
+C<dump/filter_cmd/*> configuration directives. See C<fabsys_config(1)> for more
+details.
+
+You must specify either this option, or B<--volume>, but not both.
+
+=item B<--volume> <I<pattern>>
+
+Backup only the specified volume (or volume pattern). With this option
+specified, FABS will only try to backup volumes matching the specified
+pattern. The pattern is a simple shell-style glob (for example, "vol.*").
+
+You can only specify one pattern at once. If you wish to backup multiple
+different individual volumes (instead of all configured volumes), just issue
+B<fabsys backup-start> multiple times, with different patterns.
+
+You must specify either this option, or B<--all>, but not both.
+
+=item B<--note> <I<note>>
+
+This option specifies a human-readable arbitrary "note" to be associated with
+this backup run. This can be used to indicate why a backup run is being
+created, and is displayed by B<fabsys backup-status> when viewing the backup
+run's status. For example, you may want to specify a note of "daily backup for
+Fri Jun 19" or "retrying backup for app.perl58 after failure last night".
+
+By default, a note is added that indicates the backup run was initiated from a
+manual command-line invocation.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

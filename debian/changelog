@@ -1,0 +1,5 @@
+fabs (1.0-1) unstable; urgency=low
+
+  * Initial public release.
+
+ -- Andrew Deason <adeason@sinenomine.net>  Fri, 10 Jun 2022 11:06:34 -0500

@@ -1,0 +1,44 @@
+=head1 NAME
+
+fabsys_restore-retry - Resume a failed restore request
+
+=head1 SYNOPSIS
+
+B<fabsys restore-retry> <I<req_id>>
+
+=head1 DESCRIPTION
+
+The B<fabsys restore-retry> command causes a restore request that was previously
+marked as failed to resume. The restore request is retried from the last
+successful stage of the restore, and proceeds as normal.
+
+A restore request can be marked as "failed" either due to errors, or because
+someone killed the restore request with C<fabsys_restore-kill(1)>. A single
+error normally does not cause a restore request to be marked as "failed", since
+operations are retried when an error is encountered. Thus, it takes several
+errors for a restore request to be marked as "failed", and it is recommended
+that an administrator determine and fix the cause of the failure before
+retrying the restore request.
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<req_id>>
+
+The restore request id to resume. Restore request ids can be shown with the
+C<fabsys_restore-status(1)> command.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

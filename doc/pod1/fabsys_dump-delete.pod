@@ -1,0 +1,147 @@
+=head1 NAME
+
+fabsys_dump-delete - Delete FABS volume dumps
+
+=head1 SYNOPSIS
+
+B<fabsys dump-delete> (<I<id>> [<I<id>> ...] | [B<--brid> <I<brid>>]
+    [B<--volid> <I<volid>> | B<--volume> <I<volume>>]
+    [B<--before <I<time>>] [B<--after <I<time>>]
+    [B<--redundant>[=<I<redundancy>>]]
+    [B<-n> <I<n_dumps>>] )
+    [B<--keep-blob>]
+    [B<--verbose>]
+
+=head1 DESCRIPTION
+
+The B<fabsys dump-delete> deletes volume dumps from FABS. Many options to this
+command are the same as in C<fabsys_dump-list(1)>; see C<fabsys_dump-list(1)>
+for more info.
+
+For all matching volume dumps, B<fabsys dump-delete> will delete the volume
+dump from the FABS database, as well as the corresponding volume dump blob on
+disk if it exists (unless B<--keep-blob> is given). If the deleted volume dump
+was the last volume dump for a backup run, that backup run is also deleted.
+
+As volume dumps and backup runs are deleted from the database, information on
+what was deleted is printed to stdout (or recorded in a JSON object, if
+B<--format json> was given). To see what would be deleted before actually
+deleting the dumps, give the same search criteria to C<fabsys_dump-list(1)>.
+You can then run B<fabsys_dump-delete> with the same search criteria, or just
+call B<fabsys_dump-delete> with the volume IDs shown by C<fabsys_dump-list(1)>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<id>> [<I<id>> ...]
+
+Delete the given volume dump IDs.
+
+=item B<--brid> <I<brid>>
+
+=item B<--volid> <I<volid>> | B<--volume> <I<volume>>
+
+=item B<--before> <I<time>>
+
+=item B<--after> <I<time>>
+
+=item B<--redundant>[=<I<redundancy>>]
+
+=item B<-n> <I<n_dumps>>
+
+These options are the same as in C<fabsys_dump-list(1)>, except the matching
+volume dumps are deleted instead of just shown.
+
+=item B<--verbose>
+
+Print some extra information on stderr, such as our search criteria.
+
+=item B<--keep-blob>
+
+Just delete the matching volume dump records from the FABS database. Do not
+delete the corresponding dump blob file from disk.
+
+=back
+
+=head1 EXAMPLES
+
+    $ fabsys dump-delete --volume vol.1 --before 2022-02-18 --redundant
+    Deleting Volume dump id 2003, volume: 536871063 (vol.1)
+      cloned at:    Mon Feb 14 18:47:30 2022
+      last updated: Mon Feb 14 18:46:57 2022
+      dump blob: /var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.8001.dump
+    Deleting Backup run 5 [DONE]: Manually-issued backup run from command line
+      status.2918: Done
+      cell: example.com, volume: None, errors: 0
+      start: Mon Feb 14 18:47:19 2022 EST
+      end:   Mon Feb 14 18:51:13 2022 EST
+    Successfully deleted 1 dump
+
+    $ fabsys dump-delete --volume vol.1 --before 2022-02-18 --redundant --format json | jq
+    {
+      "fabs_dump_delete": [
+        {
+          "dump": {
+            "id": 2003,
+            "vl_id": 8001,
+            "hdr_size": 31,
+            "hdr_creation": 1644882450,
+            "hdr_copy": 1630435695,
+            "hdr_backup": 1644882450,
+            "hdr_update": 1644882417,
+            "incr_timestamp": 0,
+            "dump_size": 32586,
+            "dump_storid": 1,
+            "dump_spath": "cell-example.com/20/00/00/536871063/536871063.8001.dump",
+            "dump_checksum": "md5:ebb0dfbd0badc6721a7f1c8b557fc06c",
+            "name": "vol.1",
+            "rwid": 536871063,
+            "roid": null,
+            "bkid": 536871065,
+            "cell": "example.com",
+            "br_id": 5,
+            "dump_blob": {
+              "bstore": {
+                "uuid": "a6888379-dfe9-4b72-a95a-eb13bb6b7c18",
+                "storid": 1,
+                "prefix": "/var/lib/fabs/fabs-dumps"
+              },
+              "rel_path": "cell-example.com/20/00/00/536871063/536871063.8001.dump",
+              "abs_path": "/var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.8001.dump"
+            }
+          }
+        },
+        {
+          "backup_run": {
+            "cell": "example.com",
+            "dv": 2918,
+            "end": 1644882673,
+            "errors": 0,
+            "id": 5,
+            "injected_blob_checksum": null,
+            "injected_blob_spath": null,
+            "injected_blob_storid": null,
+            "note": "Manually-issued backup run from command line",
+            "start": 1644882439,
+            "state": "DONE",
+            "state_descr": "Done",
+            "state_last": null,
+            "state_source": "fabs-1 pid:31564",
+            "volume": null
+          }
+        }
+      ]
+    }
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

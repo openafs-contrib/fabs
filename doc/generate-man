@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+mandir="$1"
+if [ x"$mandir" = x ] ; then
+    echo "Usage: $0 <mandir>" >&2
+    exit 1
+fi
+
+mkdir -p "$mandir/man1"
+
+for file in doc/pod1/*.pod ; do
+    dest="$mandir/man1/"`basename "$file" .pod`.1
+    echo "Translating $file -> $dest"
+    pod2man -c 'FABS Command Reference' -r 'FABS' -s 1 "$file" \
+        > "$dest"
+done

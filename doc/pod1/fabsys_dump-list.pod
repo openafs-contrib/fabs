@@ -1,0 +1,109 @@
+=head1 NAME
+
+fabsys_dump-list - List dumps in the FABS backup database
+
+=head1 SYNOPSIS
+
+B<fabsys dump-list> (<I<id>> [<I<id>> ...] | B<--all> | [B<--brid> <I<brid>>]
+    [B<--volid> <I<volid>> | B<--volume> <I<volume>>]
+    [B<--before <I<time>>] [B<--after <I<time>>]
+    [B<--redundant>[=<I<redundancy>>]]
+    [B<-n> <I<n_dumps>>] )
+    [B<--verbose>]
+
+=head1 DESCRIPTION
+
+The B<fabsys dump-list> command allows an administrator to lists dumps of
+volumes that have been backed up by FABS.
+
+To search for volume dumps to restore from, see C<fabsys_dump-find(1)>. Both
+commands are similar, but B<dump-find> has different options that are more
+useful when searching for a dump to restore from (such as file paths, and user
+authorization).
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<id>> [<I<id>> ...]
+
+If at least one numeric volume dump ID is given, B<fabsys dump-list> will show
+volume dump information for those dump IDs.
+
+If a dump ID is given, you cannot also give any of the other search criteria
+options like B<--volume> or B<--before>.
+
+=item B<--all>
+
+If this flag is given, list all dumps in the database. You cannot specify this
+flag together with other search criteria or dump IDs.
+
+=item B<--brid> <I<brid>>
+
+Search for volume dumps in the given backup run ID (brid).
+
+=item B<--volid> <I<volid>> | B<--volume> <I<volume>>
+
+Search for volume dumps for the given volume. If B<--volume> is given, the
+given volume name or volid is resolved to an RW volid in the VLDB (using
+B<vos>).
+
+If B<--volid> is given, B<fabsys dump-list> interprets it as an RW volid, and
+it is not looked up in the VLDB. This can be useful if the given volume no
+longer exists, or may have a different volid in the current VLDB.
+
+=item B<--before> <I<time>>
+
+=item B<--after> <I<time>>
+
+Search for volume dumps taken before or after the given timestamp.
+
+The given time can be given as a unix timestamp with a leading "@" (e.g.
+"--before @1644102842"), or as an ISO-8601 string, or any format understood by
+the Python module dateutil.parser (e.g. "2022-02-05 23:14:02 UTC").
+
+=item B<--redundant>[=<I<redundancy>>]
+
+Search for redundant volume dumps, with a redundancy of I<redundancy>. If
+B<--redundant> is given without specifying a value, the default redundancy is
+1.
+
+A volume dump is considered redundant if there are at least <I<redundancy>>
+newer volume dumps for the same volume. For example, if B<--redundancy=3> is
+given, B<fabsys dump-list> will only show volume dumps if there are at least 3
+newer volume dumps for the same volume.
+
+=item B<-n> <I<n_dumps>>
+
+Only show a maximum of <I<n_dumps>>. By default, B<fabsys dump-list> will show
+all matching dumps.
+
+=item B<--verbose>
+
+Print some extra information on stderr, such as our search criteria.
+
+=back
+
+=head1 EXAMPLES
+
+    $ fabsys dump-list --volume vol.1 --before 2022-02-18 --redundant
+    Volume dump id 2001, volume: 536871063 (vol.1)
+      cloned at:    Mon Jan 31 16:25:07 2022
+      last updated: Mon Jan 31 16:24:36 2022
+      dump blob: /var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.2001.dump
+    Volume dump id 2003, volume: 536871063 (vol.1)
+      cloned at:    Mon Feb 14 18:47:30 2022
+      last updated: Mon Feb 14 18:46:57 2022
+      dump blob: /var/lib/fabs/fabs-dumps/cell-example.com/20/00/00/536871063/536871063.8001.dump
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

@@ -1,0 +1,27 @@
+Source: fabs
+Standards-Version: 4.6.0
+Section: admin
+Priority: optional
+Maintainer: Andrew Deason <adeason@sinenomine.net>
+Build-Depends:
+ debhelper (>= 10),
+ sqlite3,
+ python3,
+ dh-python,
+ python3-pytest,
+ python3-setuptools,
+ python3-yaml,
+ python3-sqlalchemy,
+ python3-dateutil,
+ python3-alembic
+
+Package: fabs
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}
+Recommends: openafs-client, ${python3:Recommends}
+Description: flexible backup system for AFS
+ The Flexible AFS Backup System (FABS) is a suite of tools and daemons used for
+ backing up an AFS cell. FABS itself does not handle long-term storage of any
+ AFS data, but merely feeds data into an existing backup system. As such, the
+ primary duties of FABS involve orchestrating AFS backups and restores, and
+ storing a record of which path names map to which volumes.

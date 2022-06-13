@@ -1,0 +1,52 @@
+=head1 NAME
+
+fabsys_restore-status - View status of FABS restore requests
+
+=head1 SYNOPSIS
+
+B<fabsys restore-status> [<I<req_id>>] [B<--failed>] [B<--admin>]
+    [B<--user> <I<user>>]
+
+=head1 DESCRIPTION
+
+The B<fabsys restore-status> command allows you to see the status of FABS
+restore requests that are currently running, or have failed due to errors.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<req_id>
+
+If a restore request id number is provided, only print information about that
+specific restore request.
+
+=item B<--failed>
+
+By default, this command only prints information about running restore requests
+that have not failed. Pass the B<--failed> flag to show failed restore requests
+instead.
+
+=item B<--admin>
+
+Pass this flag to show only restore requests created by an administrator,
+instead of requested by an end-user.
+
+=item B<--user> I<user>
+
+Pass this potion to only show restore requests created for the specified
+username.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

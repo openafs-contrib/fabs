@@ -1,0 +1,5 @@
+#!/usr/bin/dh-exec
+etc/fabs/hooks/backend-request etc/fabs/hooks
+etc/fabs/hooks/dump-filter etc/fabs/hooks
+etc/fabs/hooks/dump-report etc/fabs/hooks
+etc/fabs/hooks/stage-notify etc/fabs/hooks

@@ -1,0 +1,124 @@
+=head1 NAME
+
+fabsys_db-upgrade - Upgrade the SQL database for FABS
+
+=head1 SYNOPSIS
+
+B<fabsys db-upgrade> [B<--sql> | B<--exec>] [B<--use-builtin>=I<when>]
+
+=head1 DESCRIPTION
+
+The B<fabsys db-upgrade> command helps with upgrading the SQL database that is
+used by FABS. As FABS is updated with new versions and gains features, from
+time to time the database format needs to change. Since changing the database
+format may prevent tools from older FABS releases from reading the database,
+upgrades between database formats are not done automatically. Instead you must
+explicitly perform database upgrades by using B<fabsys db-upgrade>.
+
+Without additional arguments, B<fabsys db-upgrade> will just tell you whether
+you need to upgrade the database format. For example, if you need to perform a
+database upgrade, you may see:
+
+    # fabsys db-upgrade
+
+    Database MUST be upgraded (version 3 -> 4)
+
+    See the documentation for the --exec and --sql options to perform the upgrade.
+    Please make a backup copy of the database before upgrading!
+
+Or if the database format is already at the latest version:
+
+    # fabsys db-upgrade
+
+    Database already at latest version 4
+
+To actually perform the upgrade, you can use the B<--exec> or B<--sql> options,
+similar to C<fabsys_db-init(1)>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--sql>
+
+With this option, B<fabsys db-upgrade> will print out the SQL to run to perform
+the upgrade. This can be useful if FABS itself does not have the rights needed
+to perform administrative operations like ALTER TABLE statements itself.
+
+=item B<--exec>
+
+With this option, B<fabsys db-upgrade> will run the relevant SQL itself to
+perform the upgrade. To do this, FABS must have enough rights in the database
+to be able to issue statements such as ALTER TABLE. The db connection
+information is specified in the B<db/url> configuration directive, described in
+C<fabsys_config(1)>.
+
+=item B<--use-builtin>=I<when>
+
+This option indicates whether B<fabsys db-upgrade> should use its builtin
+hard-coded logic to perform the upgrade, or dynamically calculate the upgrade
+using a library called Alembic. Usually the dynamic method with Alembic is
+used, but Alembic is not easily available on all platforms, so FABS contains
+hard-coded logic for some databases so they can still be upgraded without
+Alembic.
+
+This option is generally not needed, since the default value, C<auto> will
+detect if Alembic is available and use the appropriate logic. Using either
+logic should result in an identical upgrade, but of course the presence of bugs
+may cause differences.
+
+The possible values for I<when> are:
+
+=over 4
+
+=item C<auto>
+
+The default value. Automatically detect which method to use, depending on what
+libraries are available.
+
+=item C<always>
+
+Always use the builtin hard-coded logic for this upgrade.
+
+=item C<never>
+
+Never use the builtin hard-coded logic, and always use the dynamic method using
+external libraries.
+
+=back
+
+=back
+
+=head1 WARNING
+
+It is recommended to make a manual simple backup of the FABS database before
+performing an upgrade, in case anything goes wrong. For SQLite databases, a
+simple backup can be created with the following command:
+
+    # sqlite3 fabs.sqlite '.backup fabs.backup.sqlite'
+
+Which will make a copy of the database file C<fabs.sqlite> into a new file
+called C<fabs.backup.sqlite>. If something goes wrong, you can restore the
+backed-up database like so:
+
+    # sqlite3 fabs.sqlite '.restore fabs.backup.sqlite'
+
+To find the location of the database file used by FABS, run:
+
+    # fabsys config db/url
+    sqlite:////var/lib/fabs/fabs.sqlite
+
+In this example, FABS is using a SQLite database in
+C</var/lib/fabs/fabs.sqlite>.
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

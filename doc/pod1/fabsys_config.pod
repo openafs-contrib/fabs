@@ -1,0 +1,638 @@
+=head1 NAME
+
+fabsys_config - Query local FABS configuration
+
+=head1 SYNOPSIS
+
+B<fabsys config> (<I<key>> | B<--check> | B<--dump> | B<--dump-all>)
+
+=head1 DESCRIPTION
+
+The B<fabsys config> command can be used to query specific configuration
+directives from the local configuration, check the local configuration for
+validity, or to dump the entire local configuration.
+
+This page serves to document the command, as well as all known configuration
+directives. For information about known configuration directives, see the
+L<CONFIGURATION DIRECTIVES> section.
+
+=head1 OPTIONS
+
+=over 4
+
+=item <I<key>>
+
+If none of the other options are specified, the given argument is assumed to be
+a configuration directive key. B<fabsys config> will grab the key from the
+loaded configuration, and print its value to stdout. If the value is not a
+plain scalar value (that is, if it is a list or a hash), the printed value will
+be encoded in JSON.
+
+=item B<--check>
+
+This option causes B<fabsys config> just to try to load the local configuration,
+and check it for certain errors. Any configuration errors will cause an error
+message to be printed, and cause B<fabsys config> to exit with a nonzero exit
+status.
+
+Note that a zero exit status from B<fabsys config> does not necessarily mean
+that a configuration is usable. This only checks for certain immediately
+obvious errors, such as syntax errors in the configuration, or unreadable
+config files. Checking for if a database url is actually reachable, for
+example, is not performed.
+
+=item B<--dump>, B<--dump-all>
+
+Dump the loaded configuration data to stdout, in YAML format. The difference
+between B<--dump> and B<--dump-all> is that B<--dump> just dumps configuration
+directives that have been specified on disk or on the command-line. On the
+other hand, B<--dump-all> dumps all values, including those that have been left
+to their default values.
+
+=back
+
+=head1 CONFIG FILES
+
+By default, FABS will load all configuration file snippets in
+B</etc/fabs/fabs.yaml.d/>, and merge them all into one combined config file.
+If any command specifies the B<--config> option, FABS will instead just load
+that specific config file.
+
+=head1 CONFIGURATION FORMAT
+
+The configuration file format is YAML. An example config file is provided to
+demonstrate the basics of YAML syntax, but you can also view the current
+effective configuration at any time by running B<fabsys config --dump-all>.
+
+Note that in B<fabsys config> and FABS-related documentation and messages,
+configuration keys are separated by a slash, for example:
+"dump/include/volumes". Some other tools may refer to such a YAML key like
+"dump.include.volumes", but FABS uses slashes instead.
+
+=head1 CONFIGURATION DIRECTIVES
+
+=over 4
+
+=item B<db/url>
+
+The URL to use when connecting to our SQL database. This is a SQLAlchemy Core
+URL, which follows RFC-1738, and typically looks like this:
+
+    dialect://username:password@host:port/database
+
+For example:
+
+    mysql://scott:tiger@localhost/foo
+
+or
+    oracle://scott:tiger@dsn
+
+SQLite database URLs look a little odd, due to the URLs using '/' as a
+separator, which is of course identical to the traditional unix directory
+separator:
+
+    sqlite:////absolute/path/to/foo.db
+
+For more details, see the SQLAlchemy Core documentation on database urls.
+<http://docs.sqlalchemy.org/en/latest/core/engines.html>
+
+By default, the value for this directive is
+C<sqlite:////var/lib/fabs/fabs.sqlite>. That is, we use a sqlite database in
+C</var/lib/fabs/fabs.sqlite>.
+
+Currently, FABS has been most thoroughly tested with a sqlite database, and so
+using a sqlite db should be considered the most stable configuration.
+
+FABS has also been tested with MariaDB, but there are some limitations due to
+index size limits in MySQL/MariaDB. Specifically, if any backed up volumes
+contain multiple symlinks in a path that is longer than about 766 bytes, we may
+be unable to backup that volume. This is because MySQL/MariaDB cannot ensure
+unique entries with strings longer than that limit.
+
+=item B<db/batch_size>
+
+This dictates how many items FABS changes at once, when updating or adding many
+items into the database. Increasing this setting can make some bulk operations
+go faster (for example, scheduling many volumes to be dumped), but may increase
+the latency of other operations (for example, viewing backup status).
+
+The default value is C<1024>. Normally you should not need to change this
+setting.
+
+=item B<db/default_job_timeout>
+
+When running a backup, FABS enforces a time limit on certain operations, in
+order to catch situations where a backup has stalled or exited uncleanly. This
+option indicates what the default time limit should be for "quick" operations
+that we do not expect to take long (for example, examining a volume via
+B<vos>).
+
+For some operations (such as actually dumping the volume), our time limit is
+much larger, and is calculated in a different way. This option does not affect
+those operations.
+
+This option is given in seconds. The default value is C<600>, or 10 minutes.
+Normally you should not need to change this option.
+
+=item B<db/sqlite_foreign_keys>
+
+You should normally not need to change this option. If this option is disabled
+and B<db/url> specifies a sqlite database, foreign key relationships in the
+database will not be enforced, which was the only behavior in FABS version 0.14
+and earlier.
+
+By default, this option is enabled. The only reason to disable this is to
+workaround database corruption issues. If B<db/url> specifies a non-sqlite
+database, this option is ignored.
+
+=item B<afs/cell>
+
+The AFS cell this instance of fabs is running for. By default, fabs will use
+the local AFS cell, as determined by running B<fs wscell>.
+
+=item B<afs/dumpscan>
+
+The command to use when running B<afsdump_scan>. The default is just
+C<afsdump_scan>.
+
+Note that this is specified as a list, so you can pass additional arguments.
+So, you must configure this as:
+
+    afs:
+      dumpscan: ['/path/to/afsdump_scan']
+
+And NOT like this:
+
+    afs:
+      dumpscan: '/path/to/afsdump_scan'
+
+=item B<afs/vos>
+
+The command to use when running B<vos>. The default is just C<vos>.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>.
+
+=item B<afs/fs>
+
+The command to use when running B<fs>. The default is just C<fs>.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>.
+
+=item B<afs/pts>
+
+The command to use when running B<pts>. The default is just C<pts>.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>.
+
+=item B<afs/aklog>
+
+The command to use when running B<aklog>. The default is just C<aklog>.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>.
+
+=item B<afs/localauth>
+
+If enabled, fabs will use B<-localauth> when running privileged AFS commands
+like B<vos>. If disabled, fabs will instead use B<k5start> with the configured
+keytab in B<afs/keytab> to run privileged commands.
+
+Enabling this option requires that the local machine has an AFS KeyFile, and
+that the issuing user can read it.
+
+The default value is disabled.
+
+=item B<afs/keytab>
+
+The keytab to use when authenticating to AFS for privileged commands when
+B<afs/localauth> is disabled. The default value is
+C</etc/fabs/afsadmin.keytab>.
+
+=item B<afs/keytab_princ>
+
+The principal to authenticate as when using B<afs/keytab>. If this is unset,
+then fabs will just use the first principal in the keytab.
+
+By default, this directive is unset.
+
+=item B<k5start/command>
+
+The command to use when running B<k5start>. The default is just C<k5start>.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>.
+
+=item B<log/level>
+
+If this option is set, it forces the logging level to the given level. Valid
+options are:
+
+=over 4
+
+=item *
+
+debug
+
+=item *
+
+info
+
+=item *
+
+warning
+
+=item *
+
+error
+
+=item *
+
+critical
+
+=back
+
+If this option is set to C<debug>, fabs also adds a logger that logs all
+messages to stderr, using the format in B<log/debug_format>.
+
+By default, this option is not set, and so the logging level is controlled by
+the logging configuration in B<log/config_file>.
+
+=item B<log/config_file>
+
+This specifies the logging configuration to use, as specified in another
+configuration file. By default, fabs uses a configuration that logs to the
+local syslog, using the C<daemon> facility, and only logs messages of level
+INFO and higher.
+
+The configuration file format is the configuration file format used by the
+native Python logging facility, and is documented here:
+<https://docs.python.org/2/library/logging.config.html#configuration-file-format>.
+
+However, it may be easier to just look at the default configuration and modify
+that. You can find the default configuration by running
+B<fabsys config log/config_file> or B<fabsys config --dump-all>.
+
+Note that in fabs logging, all messages have an associated "message-id" or
+MID. This can be formatted in resulting log messages with the %(mid)s
+formatting specifier. All logged messages are intended to have a unique
+message-id that will not change in future releases. The exceptions are debug
+messages, and log messages that originate from outside the fabs framework.
+
+=item B<log/debug_format>
+
+If B<log/level> is set to C<debug>, fabs logs all messages to stderr. This
+option says what format to use when printing such messages.
+
+The default value is similar to the pattern used in the normal default logging
+configuration: "%(name)s %(levelname)s: %(message)s %(mid)s".
+
+=item B<storage/clean_age>
+
+Every time a backup run starts, FABS scans the temporary space in each
+configured storage dir and deletes files that look stale and were not properly
+cleaned up by FABS. This option indicates how old a file must be (in seconds)
+in order to be considered stale. Typically you should not need to change this
+option.
+
+The default value is 1 week.
+
+=item B<dump/storage_dirs>
+
+This option indicates the directories where fabs stores dumped volume blobs.
+These directories must be initialized with B<fabsys storage-init> before being
+used.
+
+The default value is a single directory, C</var/lib/fabs/fabs-dumps/>.
+
+=item B<dump/parallel/total>
+
+This option indicates the maximum number of dump jobs that can be running at
+the same time. The default value is 100, so by default, at most 100 dump jobs
+can be running at once.
+
+=item B<dump/parallel/server>
+
+This option indicates the maximum number of dump jobs per server that can be
+running at the same time. The default value is 10, so by default, at most 10
+dump jobs can be running against the same server at once.
+
+=item B<dump/parallel/partition>
+
+This option indicates the maximum number of dump jobs per partition that can be
+running at the same time. The default value is 4, so by default, at most 4 dump
+jobs can be running against the same partition at once.
+
+=item B<dump/if_offline>
+
+This option indicates what FABS should do if a volume appears to be offline
+when FABS tries to dump it. The possible values for this are:
+
+=over 4
+
+=item error
+
+An offline volume is treated as an error. If FABS encounters an offline volume
+during the dumping process, the error will be logged and the job will retry the
+operation, just like any other error.
+
+=item skip
+
+Offline volumes are ignored by FABS. If FABS encounters an offline volume
+during the dumping process, FABS will skip processing the volume, as if FABS
+had detected that the volume had not changed since the last backup run.
+
+=back
+
+If you do not expect FABS to encounter offline volumes during a backup run,
+then this option should probably be set to C<error>. You may want to set this
+to C<skip> if you deliberately keep certain volumes offline, and would prefer
+for FABS to just skip over them.
+
+The default value for this option is C<error>.
+
+=item B<dump/include/volumes>
+
+This option indicates which volumes fabs should try to back up when
+B<fabsys backup-start> is run with the B<--all> option. This is a list of glob
+patterns that will be used to match volume names. For example, specifying:
+
+    ['app.*', 'conf.*']
+
+Will cause all volumes that start with C<app.> or C<conf.> to be backed up.
+
+The default value is an empty list, so no volumes are backed up by default.
+
+Note that, in order for B<fabsys dump-find --path> to work properly, all of the
+"parent" volumes for a volume must also be backed up. See the documentation for
+B<--path> in C<fabsys_dump-find(1)> for details.
+
+=item B<dump/include/fileservers>
+
+This option is similar to B<dump/include/volumes>, but specifies servers
+instead of volume names. The values in here are also not patterns, but literal
+server names (that is, IPs or hostnames that resolve to IPs). If this option is
+specified, any volumes on the given servers will be backed up, in addition to
+any volumes matched by B<dump/include/volumes>.
+
+For the purposes of this option, the fileserver for the RW site of the volume
+is considered the fileserver for that volume.
+
+The default value is an empty list, so no volumes are backed up by default.
+
+=item B<dump/exclude/volumes>
+
+This option is the same as B<dump/exclude/volumes>, except that it specifies
+volumes that should NOT be backed up. If a volume is matched by any of the
+B<dump/include/*> criteria, and is also matched by an exclude pattern, the
+volume is not backed up.
+
+The default value is:
+
+    ['fabs.*']
+
+So volumes starting with the name C<fabs.> will not be backed up. This is to
+avoid backing up fabs' staging volumes used for restores (C<fabs.> is the
+default prefix for staging restore volumes).
+
+=item B<dump/exclude/fileservers>
+
+This option is the same as B<dump/include/fileservers>, but specifies
+fileservers that should NOT be backed up. If a volume is matched by any of the
+B<dump/include/*> criteria, but resides on a fileserver specified in this
+option, that volume will not be backed up.
+
+The default value is an empty list, so by default no fileservers are avoided.
+
+=item B<dump/filter_cmd/json>
+
+This option specifies a command that, when run, provides additional include and
+exclude patterns. The output of this command must be formatted as a JSON
+object, and the values are appended to the configured B<dump/include/*> and
+B<dump/exclude/*> values documented above.
+
+The structure of the JSON object is as follows in this example. If the
+specified command outputs this:
+
+    {
+        "include": {
+            "volumes": ["inc.*"],
+            "fileservers": ["inc-fs.example.com"],
+        },
+        "exclude": {
+            "volumes": ["exc.*"],
+            "fileservers": ["exc-fs.example.com"],
+        },
+    }
+
+Then "inc.*" will be added to our B<dump/include/volumes> configuration,
+"inc-fs.example.com" will be added to B<dump/include/fileservers>, "exc.*" will
+be added to B<dump/exclude/volumes>, and "exc-fs.example.com" will be added to
+B<dump/exclude/fileservers>.
+
+As a simpler example, to just prevent fabs from backing up volumes on
+C<fs3.example.com> and C<fs5.example.com>, make the B<dump/filter_cmd/json>
+command output the following:
+
+    {
+        "exclude": {
+            "fileservers": ["fs3.example.com", "fs5.example.com"],
+        }
+    }
+
+Of course, it is simpler to have a script use an actual JSON encoder, rather
+than trying to manually print out JSON itself.
+
+Note that you must specify this directive as a list, as described in
+B<afs/dumpscan>. The default is usually /etc/fabs/hooks/dump-filter.
+
+=item B<dump/checksum>
+
+This option specifies the checksum algorithm we should use to verify the
+integrity of vos dump blobs. Note that this algorithm does not need to be
+cryptographically secure (unless you are unsure of the security of your volume
+blob storage).
+
+The default value is "md5", since this is fast, and as mentioned, this does not
+need to be cryptographically secure.
+
+=item B<dump/error_limit>
+
+When any part of a backup run encounters an error, fabs will attempt to retry
+the operation from the last known good point. If something fails too many
+times, fabs will stop retrying, and flag that portion of the backup as
+permanently failed. This option dictates how many times fabs will retry such
+operations before giving up.
+
+The default value is 3, so by default, fabs will retry something 3 times
+before giving up.
+
+=item B<dump/max_unchanged_age>
+
+If this option is non-zero, then fabs will force a dump of a volume that has
+not changed in over B<dump/max_unchanged_age> seconds.
+
+That is, normally when fabs detects that a volume has not been changed since
+the last backup, fabs will skip dumping that volume. But when this option is
+set, an unchanged volume will be dumped anyway, if it's older than
+B<dump/max_unchanged_age> seconds.
+
+This normally is not needed, since a single copy of a volume is enough to
+restore any data in that volume. Using this option results in multiple
+redundant copies being stored for the same volume over time, which can be
+useful to defend against unforeseen issues in long-term tape storage, bugs, or
+other problems.
+
+=item B<dump/scan_links/abort_on_error>
+
+This option indicates if scanning a volume dump for symlinks and mountpoints is
+required. If scanning fails on a volume and this option is enabled, then
+dumping that volume is aborted, and an error is recorded for the volume. If
+scanning fails and this option is disabled, then dumping that volume continues
+as normal, but symlink and mountpoint path information is not stored for the
+volume. However, any error with scanning is still logged, and may be reported
+by the backup report.
+
+By default, this option is enabled.
+
+The reason for scanning a volume for symlinks and mountpoints is so FABS can
+later determine which paths refer to which AFS volumes, according to the
+backed-up data. If this fails for a volume but the volume is still backed up,
+then a user may not be able to correctly restore data from a child volume via
+its path. An administrator can still restore data, though, if they know what
+the name of the relevant volume is.
+
+=item B<report/txt/command>
+
+When a backup run finished, fabs can generate a "report" of the backup run,
+indicating when the backup run started, finished, how many volumes it backed
+up, how many errors it encountered, and various other information.
+
+If this option is specified, the specified command is run with a plain text
+human-readable report given on its standard input. As an example, to send a
+report to a certain email alias, you may specify a script that does the
+following, if you have sendmail or a sendmail replacement configured to be able
+to send email:
+
+    #!/bin/sh
+
+    (
+        echo "From: noreply@example.com"
+        echo "To: fabs-admins@example.com"
+        echo "Subject: fabs backup report"
+        echo
+        cat
+    ) | sendmail -t -i
+
+By default, this option is not set, so no report is generated.
+
+=item B<report/json/command>
+
+This option is the same as B<report/txt/command>, except that the report is
+specified as machine-readable JSON, instead of human-readable plain text. The
+data provided in stdin is intended to be interpreted by a script or program
+that will format its own report, and send it out.
+
+An example script to interpret the JSON information is provided in
+F<example_fabsreport.pl> in the FABS documentation directory.
+
+=item B<report/only_on_error>
+
+By default, the commands mentioned in B<report/txt/command> and
+B<report/json/command> are run every time a backup run finishes. If instead you
+would prefer to only generate reports when at least one error is encountered,
+enable this option.
+
+By default, this option is disabled, so reports are sent even when nothing went
+wrong.
+
+=item B<restore/error_limit>
+
+This is the same as the B<dump/error_limit> directive, but applied to restore
+requests, instead of backup runs.
+
+=item B<stage/volume_prefix>
+
+The prefix to give to staged volume names. When a restore request is processed,
+the restored data is stored in a temporary staging volume, and this
+configuration directive controls what that volume is named. The default is
+"fabs.", so staging volume names will start with "fabs.".
+
+=item B<stage/server>
+
+The AFS fileserver to restore staged volumes to. The default is an invalid
+server name, so restores will fail if this is not configured.
+
+=item B<stage/partition>
+
+The partition on B<stage/server> to restore staged volumes to. The default is
+an invalid partition name, so restores will fail if this is not configured.
+
+=item B<stage/dir>
+
+The directory in /afs that staging volumes will be mounted in. The default is
+an invalid directory, so restores will fail if this is not configured.
+
+=item B<stage/lifetime>
+
+The amount of time, in seconds, that staging volumes will exist before
+automatically deleted. Defaults to 1 week, which is 604800 seconds.
+
+=item B<stage/notify_cmd>
+
+The command to run when staging a volume for a restore request has finished,
+and the data is accessible. Note that you must specify this as a list, as
+described in B<afs/dumpscan>.
+
+The default value for this is usually /etc/fabs/hooks/stage-notify. An example
+notify script is provided in that file that demonstrates what information is
+provided to that script.
+
+=item B<backend/request_cmd>
+
+When fabs tries to restore a volume, and finds that the volume blob in the
+backend storage area is missing, it will request that the volume blob be
+restored from tape by running this command.
+
+The output of this command is recorded and associated with the relevant restore
+request. For end-user requests, it is also shown to the user. It is intended
+that the output of this command provides some kind of reference to the request
+to restore the volume blob from disk.
+
+Note that you must specify this as a list, as described in B<afs/dumpscan>. The
+default is usually /etc/fabs/hooks/backend-request, which also contains an
+example script that demonstrates what kind of information is provided to the
+script.
+
+=item B<backend/check_interval>
+
+When fabs runs the B<backend/request_cmd> to restore a volume blob from tape,
+fabs periodically checks if the volume blob has been restored, so the restore
+request can continue. This directive says how long, in seconds, to wait between
+these checks.
+
+The default value is 60 seconds, or 1 minute.
+
+=item B<lockdir>
+
+This specifies the directory to use for lockfiles. Typically you do not need to
+change this.
+
+By default, this is set to C</var/lock>.
+
+=item B<bufsize>
+
+The buffer size, in bytes, that FABS uses for some I/O loops. Typically you do
+not need to change this.
+
+By default, this option is set to C<1048576> (1 MiB).
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration,
+typically in B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

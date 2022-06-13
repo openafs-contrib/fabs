@@ -1,0 +1,29 @@
+#!/bin/sh
+
+#user="$FABS_STAGE_USER"
+#path="$FABS_STAGE_PATH"
+#volume="$FABS_STAGE_VOLUME"
+#req_path="$FABS_REQUEST_PATH"
+#
+#if [ x"$user" = x ] ; then
+#    user="fabs-admins"
+#fi
+#
+#if [ x"$req_path" != x ] ; then
+#    req_str="path $req_path"
+#else
+#    req_str="volume $volume"
+#fi
+#
+#(
+#    echo "From: noreply@example.com"
+#    echo "To: $user@example.com"
+#    echo "Subject: Your restore request is ready"
+#    echo
+#    echo "Your request to restore $req_str"
+#    echo "has completed. You can access the requested files in the temporary location"
+#    echo "$path".
+#    echo
+#    echo "Please copy your files out of there soon, since that location will only be"
+#    echo "available temporarily."
+#) | sendmail -t -i

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+exit 0
+
+#(
+#    echo "From: noreply@example.com"
+#    echo "To: fabs-admins@example.com"
+#    echo "Subject: fabs backup report"
+#    echo
+#    cat
+#) | sendmail -t -i

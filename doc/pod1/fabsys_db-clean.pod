@@ -1,0 +1,59 @@
+=head1 NAME
+
+fabsys_db-clean - Cleanup dangling references in the FABS database
+
+=head1 SYNOPSIS
+
+B<fabsys db-clean> [B<--brids> <I<brid>>+] [B<--all>] [B<--recent>]
+
+=head1 DESCRIPTION
+
+The B<fabsys db-clean> command can be used to cleanup unnecessary lingering
+items in the FABS database. This command should not normally need to be used in
+everyday operation, but changes in FABS across releases (or bugs) may result in
+some database items not getting removed automatically. When this happens and
+the FABS database grows to a cumbersome size, the B<fabsys db-clean> command
+can be used to remove unneeded items in the database.
+
+One of B<--brids>, B<--all>, or B<--recent> must be specified.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--brids> <I<brid>>+
+
+Only clean database items for the given backup run IDs (I<brid>s). It is an
+error to specify a backup run that is actively running (you can use B<fabsys
+backup-kill> to force a backup run to no longer be active, if needed).
+
+=item B<--all>
+
+Clean database items for everything in the database (except for backup runs
+that are actively running).
+
+=item B<--recent>
+
+Clean database items from "recent" backup runs. This does the exact same thing
+that B<fabsys server> does in the background to automatically clean the
+database, and so should not normally be needed. This may be useful to test or
+reproduce issues with the background processing of B<fabsys server>, or to run
+periodically if B<fabsys server> is stopped between backup runs for any reason.
+
+A "recent" backup run is currently defined as a backup run that was started
+within the last 12 hours, but may change over time. If I<any> backup run is
+actively running, nothing in the database will be cleaned.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

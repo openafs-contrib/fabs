@@ -1,0 +1,42 @@
+=head1 NAME
+
+fabsys_backup-status - View status of FABS backup runs
+
+=head1 SYNOPSIS
+
+B<fabsys backup-status> [<I<brun_id>>] [B<--failed>]
+
+=head1 DESCRIPTION
+
+The B<fabsys backup-status> command allows you to see the status of FABS backup
+runs that are currently running, or have failed due to errors. By default
+without any arguments, it will display information about all backup runs that
+are running but have not yet finished and have not failed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<brun_id>
+
+If a backup run id number is provided, only print information about that backup
+run.
+
+=item B<--failed>
+
+By default, this command only prints information about running backup runs that
+have not failed. Pass the B<--failed> flag to show failed backup runs instead.
+
+=back
+
+=head1 PRIVILEGED REQUIRED
+
+The issuer of this command must be able to read the FABS configuration
+(specifically, the database access information), typically in
+B</etc/fabs/fabs.yaml.d/>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015, Sine Nomine Associates.
+
+See the provided LICENSE file for licensing terms.

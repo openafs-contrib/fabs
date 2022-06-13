@@ -1,0 +1,57 @@
+#!/usr/bin/make -f
+
+VERSION=`./rpm/get-version`
+RPMBUILD=rpmbuild --define "_topdir `pwd`/rpm" --define "fabsver $(VERSION)"
+
+help:
+	@echo "Targets:"
+	@echo "    tgz: Build a fabs-v*.tar.gz source tarball"
+	@echo "    srpm-el7: Build an srpm for EL7"
+	@echo "    rpm-el7:  Build an rpm for EL7"
+	@echo "    srpm-el8: Build an srpm for EL8"
+	@echo "    rpm-el8:  Build an rpm for EL8"
+	@echo "    srpm-fedora: Build an srpm for Fedora"
+	@echo "    rpm-fedora:  Build an rpm for Fedora"
+
+clean:
+
+tgz:
+	tmpfile=`mktemp --tmpdir fabs-tgz.XXXXXX` && \
+	tar --exclude='.git*' \
+	    --exclude='*.tar.gz' \
+	    --exclude='*.rpm' \
+	    --exclude='*.swp' \
+	    --transform "s,^[.],fabs-$(VERSION)," \
+	    -czf "$$tmpfile" . && \
+	mkdir -p rpm/SOURCES && \
+	mv "$$tmpfile" rpm/SOURCES/fabs-v$(VERSION).tar.gz
+	@echo
+	@echo Tarball is in rpm/SOURCES/fabs-v$(VERSION).tar.gz
+	@echo
+
+srpm-el7: tgz
+	$(RPMBUILD) -bs rpm/fabs-el7.spec
+
+rpm-el7: srpm-el7
+	$(RPMBUILD) --rebuild rpm/SRPMS/fabs-$(VERSION)-*.*.src.rpm
+	@echo
+	@echo RPM should be in rpm/RPMS/noarch/fabs-$(VERSION)-*.*.rpm
+	@echo
+
+srpm-el8: tgz
+	$(RPMBUILD) -bs rpm/fabs-el8.spec
+
+rpm-el8: srpm-el8
+	$(RPMBUILD) --rebuild rpm/SRPMS/fabs-$(VERSION)-*.*.src.rpm
+	@echo
+	@echo RPM should be in rpm/RPMS/noarch/fabs-$(VERSION)-*.*.rpm
+	@echo
+
+srpm-fedora: tgz
+	$(RPMBUILD) -bs rpm/fabs-fedora.spec
+
+rpm-fedora: srpm-fedora
+	$(RPMBUILD) --rebuild rpm/SRPMS/fabs-$(VERSION)-*.fc*.src.rpm
+	@echo
+	@echo RPM should be in rpm/RPMS/noarch/fabs-$(VERSION)-*.fc*.rpm
+	@echo
