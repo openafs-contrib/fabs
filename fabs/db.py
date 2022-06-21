@@ -1243,6 +1243,14 @@ class _BackupRunDb:
         q = model.vl_fileservers.delete().where(model.vl_fileservers.c.br_id == brid)
         db.execute(q)
 
+        # Delete all 'links' entries that reference vl_entries in this brid.
+        sub_q = sa.select([model.vl_entries.c.id]).where(
+                    model.vl_entries.c.br_id == brid
+                )
+        # pylint: disable=no-value-for-parameter
+        q = model.links.delete().where(model.links.c.vl_id.in_(sub_q))
+        db.execute(q)
+
         # Delete all vl_entries that reference this brid.
         # pylint: disable=no-value-for-parameter
         q = model.vl_entries.delete().where(model.vl_entries.c.br_id == brid)
@@ -1631,6 +1639,11 @@ class _VLEntryDb:
                             sa.not_(model.vl_entries.c.id.in_(sa.select([model.volume_dumps.c.vl_id]))),
                     )
                 )
+
+        # pylint: disable=no-value-for-parameter
+        q = model.links.delete().where(model.links.c.vl_id.in_(sub_q))
+        res = db.execute(q)
+        res.close()
 
         # pylint: disable=no-value-for-parameter
         q = model.vl_sites.delete().where(model.vl_sites.c.vl_id.in_(sub_q))
