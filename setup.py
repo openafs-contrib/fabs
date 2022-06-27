@@ -20,7 +20,7 @@ with open('.version') as fh:
 # Set our "build-time" constants, which will be available in fabs.const when
 # fabs is built.
 _const_dict = {}
-_const_dict['PREFIX'] = os.environ.get('PREFIX', '/usr/local')
+_const_dict['PREFIX'] = os.environ.get('PREFIX', '/opt/fabs')
 _const_dict['SYSCONFDIR'] = os.environ.get('SYSCONFDIR',
                                            os.path.join(_const_dict['PREFIX'],
                                                         'etc'))

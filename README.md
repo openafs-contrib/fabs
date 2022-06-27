@@ -12,7 +12,7 @@ To manually install, run something like the following:
     $ python setup.py build
     $ python setup.py install --skip-build
 
-However, by default, that will use paths in /usr/local. For more traditional
+However, by default, that will use paths in `/opt/fabs`. For more traditional
 paths, you can specify a few path variables like so:
 
     $ export PREFIX=/usr
