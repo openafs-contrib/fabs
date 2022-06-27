@@ -7,10 +7,12 @@ up AFS cells, to be used together with separate (possibly existing) "plain"
 backup system.
 """
 
-import sys
+import glob
+import json
 import os.path
 import pathlib
-import json
+import subprocess
+import sys
 
 from setuptools import setup
 from setuptools.command.build_py import build_py
@@ -68,11 +70,34 @@ def _gen_const_py():
 
     os.rename(const_py_tmp, const_py)
 
-# Subclass the 'build_py' command to generate fabs/const.py at build time.
+def _run(argv):
+    arg_str = ' '.join(argv)
+    print("+ %s" % arg_str, file=sys.stderr)
+    subprocess.run(argv, check=True)
+
+# Subclass the 'build_py' command to run a few extra things at build time.
 class fabs_build_py(build_py):
     def run(self):
+        # Generate fabs/const.py
         _gen_const_py()
+
+        # Generate manpages in doc/man1
+        _run(['./doc/generate-man', 'doc'])
+
         super().run()
+
+def get_data_files():
+    man_paths = []
+
+    for path in glob.iglob('doc/pod1/*.pod'):
+        fname = os.path.basename(path)
+        assert fname.endswith('.pod')
+
+        page_name = fname[:-len('.pod')]
+
+        man_paths.append('doc/man1/%s.1' % page_name)
+
+    yield ('share/man/man1', man_paths)
 
 topdir = pathlib.Path(__file__).parent
 readme_path = topdir / "README.md"
@@ -109,5 +134,9 @@ setup(
     package_data={'fabs': [
         'log_cli.conf',
         'log_daemon.conf',
-    ]}
+    ]},
+
+    # Include files outside of our 'fabs' subdir (man pages, hook examples,
+    # etc)
+    data_files=list(get_data_files()),
 )

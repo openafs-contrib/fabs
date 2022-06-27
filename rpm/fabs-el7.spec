@@ -43,7 +43,10 @@ PREFIX=%{_prefix} LOCALSTATEDIR=%{_var} SYSCONFDIR=%{_sysconfdir} %py3_build
 
 %install
 PREFIX=%{_prefix} LOCALSTATEDIR=%{_var} SYSCONFDIR=%{_sysconfdir} %py3_install
-./doc/generate-man %{buildroot}/%{_mandir}
+
+mkdir -p %{buildroot}/%{_mandir}/man1
+cp -a doc/man1/*.1 %{buildroot}/%{_mandir}/man1/
+
 mkdir -p %{buildroot}/%{_sysconfdir}/fabs/fabs.yaml.d
 mkdir -p %{buildroot}/%{_var}/lib/fabs/fabs-dumps
 mkdir -p %{buildroot}/%{_var}/lock
