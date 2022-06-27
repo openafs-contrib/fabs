@@ -9,6 +9,7 @@ backup system.
 
 import sys
 import os.path
+import pathlib
 import json
 
 from setuptools import setup
@@ -73,13 +74,18 @@ class fabs_build_py(build_py):
         _gen_const_py()
         super().run()
 
+topdir = pathlib.Path(__file__).parent
+readme_path = topdir / "README.md"
+readme_contents = readme_path.read_text()
+
 setup(
     name='fabs',
     version=__version__,
     license='ISC',
     author='Sine Nomine Associates',
     description='A flexible backup suite for AFS cells',
-    long_description=__doc__,
+    long_description=readme_contents,
+    long_description_content_type='text/markdown',
     install_requires=[
         'PyYAML>=3.10',
         'SQLAlchemy>=0.8',

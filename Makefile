@@ -5,6 +5,11 @@ help:
 	@echo "  make pyflakes: Run pyflakes on our source"
 	@echo "  make pylint:   Run pylint on our source"
 	@echo "  make tests:    Run our pytest unit tests"
+	@echo
+	@echo "Maintainer targets:"
+	@echo "  make pypi-build:     Build stuff for pushing to pypi"
+	@echo "  make pypi-push-test: Push release to test.pypi.org"
+	@echo "  make pypi-push-prod: Push release to the real pypi.org"
 
 PYFLAKES=pyflakes-3
 pyflakes:
@@ -32,3 +37,17 @@ tests:
 quickcheck: pyflakes podcheck
 
 check: quickcheck pylint tests
+
+pypi-build:
+	PREFIX=/usr LOCALSTATEDIR=/var SYSCONFDIR=/etc \
+		python3 -m build --sdist --wheel --outdir dist/
+
+pypi-push-test: pypi-build
+	twine upload -r testpypi dist/*
+
+pypi-push-prod: pypi-build
+	@echo "*** WARNING:"
+	@echo "*** WARNING: You are pushing to the real prod pypi"
+	@echo "*** WARNING:"
+	@echo
+	twine upload dist/*
