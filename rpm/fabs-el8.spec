@@ -74,7 +74,7 @@ install -m 755 etc/fabs/hooks/stage-notify %{buildroot}/%{_sysconfdir}/fabs/hook
 %config(noreplace) %{_sysconfdir}/fabs/hooks/dump-report
 %config(noreplace) %{_sysconfdir}/fabs/hooks/stage-notify
 
-%doc README
+%doc README.md
 %doc doc/example_fabsreport.pl
 
 %changelog
