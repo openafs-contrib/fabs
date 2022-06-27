@@ -2,15 +2,44 @@
 This is FABS, the "Flexible AFS Backup System", a set of tools and daemons to
 help backup AFS cells. This file serves as a kind of "quick start" for setting
 up fabs, as well as a general overview of what it is. It does not document all
-of the functionality in fabs.
+of the functionality in fabs; see our manpages for more detailed info.
 
-Installation
-============
+Install (RPM/Debian)
+====================
 
-To manually install, run something like the following:
+A few prebuilt packages are available for each release on GitHub:
+<https://github.com/openafs-contrib/fabs/releases/>
 
-    $ python setup.py build
-    $ python setup.py install --skip-build
+For RHEL/CentOS and Fedora, you can also use the openafs-contrib yum repo
+provided by Sine Nomine Associates:
+
+    $ yum install https://download.sinenomine.net/openafs/contrib/sna-openafs-contrib-release-latest.noarch.rpm
+
+See <https://download.sinenomine.net/openafs/contrib/> for info about the repo.
+
+Note that the RPM packaging does not declare dependencies for the following:
+
+ - OpenAFS itself
+ - dumpscan
+
+This just makes it easier to install fabs when those are not installed via RPM,
+which is pretty common. You must ensure yourself that OpenAFS and dumpscan are
+built and installed somewhere. You can get dumpscan from the OpenAFS source
+tree, or you can build a standalone dumpscan from here:
+<https://github.com/openafs-contrib/cmu-dumpscan>.
+
+Install (pip)
+=============
+
+    $ pip3 install --upgrade fabs
+
+Install from source
+===================
+
+To manually install from a git checkout, run something like the following:
+
+    $ python3 setup.py build
+    $ python3 setup.py install --skip-build
 
 However, by default, that will use paths in `/opt/fabs`. For more traditional
 paths, you can specify a few path variables like so:
@@ -18,37 +47,23 @@ paths, you can specify a few path variables like so:
     $ export PREFIX=/usr
     $ export LOCALSTATEDIR=/var
     $ export SYSCONFDIR=/etc
-    $ python setup.py build && python setup.py install --skip-build
+    $ python3 setup.py build && python3 setup.py install --skip-build
 
 This will only install the fabs libraries and commands, though. There are some
 additional man pages and other documentation in the `doc` dir. Ideally, just
 use the RPM or other packaging to install fabs.
 
-Packaging
-=========
+Building Packages
+=================
 
 Example Debian packaging exists in the `debian` dir. Run the normal `debuild`
 command or similar to build a Debian package.
 
-In the `rpm` dir, there is some crude packaging to help generate RPMs.  You
-should be able to just run the following to generate an RPM for RHEL7/CentOS7:
+RPM packaging is in the `rpm` dir. Run:
 
-    $ ./rpm/rules rpm-el7
+    $ ./rpm/rules help
 
-See `./rpm/rules help` for other targets.
-
-Of course, if you already have an RPM, just install it via `rpm -ivh` or
-`yum localinstall` or whatever you like.
-
-Note that the RPM packaging does not explicitly require everything we need for
-fabs. Specifically, it is missing dependencies for the following:
-
- - OpenAFS itself
- - dumpscan
-
-Lacking dependencies for those just makes it easier to install fabs when those
-are not installed via RPM, which is pretty common. You must ensure yourself
-that OpenAFS and dumpscan are built and installed somewhere.
+To see a list of targets to build.
 
 Setup
 =====
