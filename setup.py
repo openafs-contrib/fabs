@@ -16,7 +16,7 @@ from setuptools import setup
 from setuptools.command.build_py import build_py
 
 with open('.version') as fh:
-    __version__ = fh.readline().rstrip()
+    __version__ = fh.readline().rstrip().replace('~', '')
 
 # Set our "build-time" constants, which will be available in fabs.const when
 # fabs is built.
