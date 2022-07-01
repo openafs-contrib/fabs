@@ -2,7 +2,8 @@ Source: fabs
 Standards-Version: 4.6.0
 Section: admin
 Priority: optional
-Maintainer: Andrew Deason <adeason@sinenomine.net>
+Maintainer: Sine Nomine Associates <sna-packager@sinenomine.net>
+Homepage: https://github.com/openafs-contrib/fabs
 Build-Depends:
  debhelper (>= 10),
  sqlite3,

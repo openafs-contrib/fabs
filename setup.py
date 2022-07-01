@@ -108,6 +108,8 @@ setup(
     version=__version__,
     license='ISC',
     author='Sine Nomine Associates',
+    author_email='sna-packager@sinenomine.net',
+    url='https://github.com/openafs-contrib/fabs',
     description='A flexible backup suite for AFS cells',
     long_description=readme_contents,
     long_description_content_type='text/markdown',

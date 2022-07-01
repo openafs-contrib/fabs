@@ -4,7 +4,7 @@ Release: 1%{?dist}
 Summary: Flexible AFS Backup System
 
 License: ISC
-URL:     http://www.sinenomine.net/
+URL:     https://github.com/openafs-contrib/fabs
 Source0: fabs-v%{fabsver}.tar.gz
 
 BuildArch: noarch
