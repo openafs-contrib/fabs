@@ -1,3 +1,10 @@
+fabs (1.1-1) unstable; urgency=low
+
+  * New release.
+  * Set maintainer to sna-packager@sinenomine.net.
+
+ -- Andrew Deason <adeason@sinenomine.net>  Fri, 01 Jul 2022 12:52:35 -0500
+
 fabs (1.0-1) unstable; urgency=low
 
   * Initial public release.
