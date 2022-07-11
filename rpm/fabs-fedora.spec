@@ -18,6 +18,7 @@ BuildRequires: python3dist(pyyaml)
 BuildRequires: python3dist(sqlalchemy)
 BuildRequires: python3dist(python-dateutil)
 BuildRequires: python3dist(alembic)
+BuildRequires: sqlite
 
 # alembic is an optional dep in setup.py, but declare it Requires so it gets
 # pulled in automatically.

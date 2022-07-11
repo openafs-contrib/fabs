@@ -17,6 +17,7 @@ BuildRequires: python3dist(pyyaml)
 BuildRequires: python3dist(sqlalchemy)
 BuildRequires: python3dist(python-dateutil)
 BuildRequires: python3dist(alembic)
+BuildRequires: sqlite
 
 # Needed for automatic python Requires/Provides
 BuildRequires: epel-rpm-macros
