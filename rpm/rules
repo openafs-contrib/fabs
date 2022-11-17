@@ -10,6 +10,8 @@ help:
 	@echo "    rpm-el7:  Build an rpm for EL7"
 	@echo "    srpm-el8: Build an srpm for EL8"
 	@echo "    rpm-el8:  Build an rpm for EL8"
+	@echo "    srpm-el9: Build an srpm for EL9"
+	@echo "    rpm-el9:  Build an rpm for EL9"
 	@echo "    srpm-fedora: Build an srpm for Fedora"
 	@echo "    rpm-fedora:  Build an rpm for Fedora"
 
@@ -42,6 +44,15 @@ srpm-el8: tgz
 	$(RPMBUILD) -bs rpm/fabs-el8.spec
 
 rpm-el8: srpm-el8
+	$(RPMBUILD) --rebuild rpm/SRPMS/fabs-$(VERSION)-*.*.src.rpm
+	@echo
+	@echo RPM should be in rpm/RPMS/noarch/fabs-$(VERSION)-*.*.rpm
+	@echo
+
+srpm-el9: tgz
+	$(RPMBUILD) -bs rpm/fabs-el9.spec
+
+rpm-el9: srpm-el9
 	$(RPMBUILD) --rebuild rpm/SRPMS/fabs-$(VERSION)-*.*.src.rpm
 	@echo
 	@echo RPM should be in rpm/RPMS/noarch/fabs-$(VERSION)-*.*.rpm
