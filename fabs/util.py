@@ -150,7 +150,15 @@ def pts_auth():
 def fs_auth():
     command = config.get('afs/fs')
     defaults = {}
+
     _auth_cmd(command, defaults)
+    if 'localauth' in defaults:
+        raise err.ConfigError(
+            "Cannot run 'fs' commands with localauth. FABS currently provides "
+            "limited support for the afs/localauth option, and its use is not "
+            "recommended in production environments. To avoid this error, use "
+            "another authentication method."
+        )
     return fabs.cmd.Fs(fs=command, defaults=defaults)
 
 def dumpscan():
