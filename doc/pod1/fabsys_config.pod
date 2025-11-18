@@ -204,7 +204,7 @@ The default value is disabled.
 =item B<afs/keytab>
 
 The keytab to use when authenticating to AFS for privileged commands when
-B<afs/localauth> is disabled. The default value is
+B<afs/localauth> and B<afs/extauth> are disabled. The default value is
 C</etc/fabs/afsadmin.keytab>.
 
 =item B<afs/keytab_princ>
@@ -213,6 +213,20 @@ The principal to authenticate as when using B<afs/keytab>. If this is unset,
 then fabs will just use the first principal in the keytab.
 
 By default, this directive is unset.
+
+=item B<afs/extauth>
+
+If enabled, FABS will skip its own authentication setup and assume that valid
+AFS tokens are already present in the execution environment. This is useful
+for environments where authentication is managed externally. Compared to the
+default keytab-based authentication, this reduces how often we need to contact
+the krb5 KDC, avoiding potential throttling for busier installations.
+
+This option takes precedence over both B<afs/localauth> and keytab-based
+authentication (using B<afs/keytab>). If B<afs/extauth> is enabled, these other
+authentication settings will be ignored.
+
+The default value is disabled.
 
 =item B<k5start/command>
 

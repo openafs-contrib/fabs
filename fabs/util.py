@@ -100,6 +100,11 @@ def _check_aklog(aklog):
 _check_aklog.warned = False
 
 def _auth_cmd(command, defaults):
+    if config.get('afs/extauth'):
+        # Assume authentication is handled externally and the execution
+        # environment already contains valid AFS tokens.
+        return
+
     if config.get('afs/localauth'):
         # Run with -localauth if localauth is turned on
         defaults['localauth'] = True

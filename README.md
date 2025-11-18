@@ -135,16 +135,17 @@ AFS/krb5 Setup
 ==============
 
 In order for fabs to be able to dump volumes and do other privileged operations
-with AFS, it needs some credentials to do. This can be provided by a krb5
-keytab.
+with AFS, it needs credentials. These can be provided via a krb5 keytab, or if
+valid tokens are already present in the execution environment, fabs can be
+configured to use them directly via the `afs/extauth` option.
 
 You can also use -localauth for authenticated AFS commands, but this is not
 recommended for production use, since not all operations support -localauth. To
 use this (perhaps for initial testing or debugging), enable the configuration
 option `afs/localauth`.
 
-For non-localauth mode, you need a krb5 keytab to authenticate to AFS. By
-default, fabs looks for this keytab in /etc/fabs/afsadmin.keytab, but you can
+For keytab-based authentication, you need a krb5 keytab to authenticate to AFS.
+By default, fabs looks for this keytab in /etc/fabs/afsadmin.keytab, but you can
 specify a different path with the config option `afs/keytab`.
 
 You must be able to authenticate to AFS using this keytab. Here is an example
@@ -155,6 +156,13 @@ of how you can do so manually:
 That command will examine the root.cell volume in your cell after
 authenticating to AFS using the afsadmin.keytab file via k5start. If you see
 any errors or warnings, something is probably wrong.
+
+When using the external authentication mode (`afs/extauth`), it is the
+administrator's responsibility to manage the authentication tokens, and FABS
+requires on the tokens being present in the execution environment. For instance,
+one could use `k5start` to obtain tokens and then execute the FABS server:
+
+    $ k5start -t -a -f /etc/fabs/afsadmin.keytab -U -- fabsys server
 
 FABS also makes use of some AFS `fs` commands, so make sure you have an AFS
 client running and operational.
