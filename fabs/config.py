@@ -185,6 +185,7 @@ class _Config:
                    default=os.path.join(const.CONF_DIR, 'afsadmin.keytab')),
         _Directive('afs/keytab_princ', default=None,
                    example='user@EXAMPLE.COM'),
+        _Directive('afs/extauth', default=False),
 
         _Directive('k5start/command', default=['k5start']),
 
