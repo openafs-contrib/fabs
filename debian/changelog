@@ -1,3 +1,9 @@
+fabs (1.2-1) unstable; urgency=low
+
+  * New release.
+
+ -- Andrew Deason <adeason@sinenomine.net>  Wed, 19 Nov 2025 17:09:00 -0600
+
 fabs (1.1-1) unstable; urgency=low
 
   * New release.
